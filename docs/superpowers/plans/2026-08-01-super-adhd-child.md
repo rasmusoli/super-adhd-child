@@ -257,7 +257,33 @@ Create .codex-plugin/plugin.json with this exact shape:
 
 Expected: no hooks, runtime component paths, or placeholder values.
 
-- [ ] Step 2: Write README.md with these exact sections and claims: normal Superpowers workflow; explicit /adhd invocation; ADHD generation/scoring/clustering/trap detection/deepening; handoff to super-adhd-child:brainstorming; duplicate-installation guidance; dependency boundary excluding the ADHD CLI/library and Anthropic Agent SDK; and a pointer to THIRD_PARTY_NOTICES.md.
+- [ ] Step 2: Write README.md with this content:
+
+~~~markdown
+# Super ADHD Child
+
+Super ADHD Child is a dependency-free Codex plugin combining the Superpowers software-development methodology with the ADHD divergent-ideation skill.
+
+## Normal workflow
+
+Use the Superpowers skills for ordinary work: brainstorming and design approval, implementation planning, TDD, systematic debugging, parallel execution, code review, verification, and branch finishing.
+
+## ADHD mode
+
+Run /adhd <problem> or explicitly ask for ADHD mode, divergent ideation, parallel cognitive frames, or trap-focused exploration. ADHD generates broadly, scores and clusters candidates, flags traps, and deepens survivors. It does not silently implement a candidate. When a direction is selected, continue with super-adhd-child:brainstorming, then use the Superpowers planning and implementation workflow.
+
+## Installation and duplicate triggers
+
+Install this repository as the super-adhd-child Codex plugin. When using it, disable separate standalone ADHD and Superpowers installations so their skills do not compete. This plugin never removes or changes those installations.
+
+## Dependency boundary
+
+The first version contains skill and documentation files only. It does not bundle the ADHD CLI/library, Anthropic Agent SDK packages, hooks, or other runtime services.
+
+## Upstream attribution
+
+See THIRD_PARTY_NOTICES.md for the pinned source commits, MIT notices, and local modifications.
+~~~
 
 - [ ] Step 3: Add LICENSE and THIRD_PARTY_NOTICES.md. LICENSE contains the standard MIT permission and warranty text for this combined package. THIRD_PARTY_NOTICES.md identifies both repositories and exact SHAs, reproduces the Superpowers and ADHD MIT copyright/license notices from their source LICENSE files, and lists these local modifications: the ADHD rename, manual-first trigger and handoff, namespace adaptation, added router, and exclusion of hooks, package files, CLI/library code, tests, and runtime dependencies.
 
@@ -274,7 +300,7 @@ Expected: the plugin validator passes once the skill tree is present, and git di
 
 ~~~bash
 git add .codex-plugin/plugin.json README.md LICENSE THIRD_PARTY_NOTICES.md
-git commit -m "docs: add plugin metadata and upstream notices"
+git commit -m "feat: create combined super-adhd-child plugin"
 ~~~
 
 Expected: a commit containing the manifest, README, license, and notices.
@@ -365,8 +391,8 @@ Expected: support-file counts match, whitespace validation passes, and only inte
 
 ~~~bash
 git log --oneline --decorate --max-count=6
-git diff master..HEAD --stat
-git diff master..HEAD -- .codex-plugin/plugin.json README.md THIRD_PARTY_NOTICES.md skills/adhd-ideation/SKILL.md skills/using-super-adhd-child/SKILL.md
+git diff "$(git rev-list --max-parents=0 HEAD)" HEAD --stat
+git diff "$(git rev-list --max-parents=0 HEAD)" HEAD -- .codex-plugin/plugin.json README.md THIRD_PARTY_NOTICES.md skills/adhd-ideation/SKILL.md skills/using-super-adhd-child/SKILL.md
 ~~~
 
 Expected: the diff contains the manifest, docs, notices, router, adapted ADHD skill, and the complete selected Superpowers tree, with no unrelated upstream runtime repository content.
@@ -418,4 +444,3 @@ Expected: both commands report codex/super-adhd-child and the same commit SHA as
 - [ ] Step 5: Report the complete handoff.
 
 Report the final branch, commit SHA, official validator result, custom invariant checks, upstream SHAs, push result, and the instruction to disable separate standalone ADHD and Superpowers installations while using this combined plugin.
-
