@@ -30,6 +30,14 @@ When multiple skills apply, process skills come first — they set the approach,
 - "Let's build X" → super-adhd-child:brainstorming first, then implementation skills.
 - "Fix this bug" → super-adhd-child:systematic-debugging first, then domain skills.
 
+## Operational Defaults
+
+For implementation, diagnosis, architecture, automation, research, documentation,
+or learning tasks, read [`operational-patterns.md`](operational-patterns.md) and
+apply only the relevant guidance. It is a compact decision aid, not a mandatory
+workflow: simple tasks stay direct; material-risk tasks get explicit assumptions,
+rollback, and verification.
+
 ## Red Flags
 
 These thoughts mean STOP—you're rationalizing:

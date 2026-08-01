@@ -1,7 +1,6 @@
 ---
 name: adhd-ideation
 description: "Use when the user explicitly requests ADHD mode, divergent ideation, parallel cognitive frames, or trap-focused exploration."
-license: MIT
 ---
 
 # ADHD

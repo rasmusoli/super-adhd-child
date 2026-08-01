@@ -80,4 +80,8 @@ The combined plugin makes these changes to the upstream skill material:
 4. Adds the `using-super-adhd-child` routing skill.
 5. Excludes upstream hooks, plugin manifests, package files, CLI/library code, tests, and runtime dependencies.
 
+6. Adds a compact cross-cutting operational-patterns reference for objective-first execution, evidence-led action, conditional automation, operational fit, proportional communication, and applied learning.
+
+7. Keeps skill frontmatter limited to `name` and `description` without changing existing skill triggers.
+
 The plugin does not include the ADHD CLI/library or Anthropic Agent SDK dependencies. It also does not remove, alter, or uninstall any standalone ADHD or Superpowers installation.

@@ -1,7 +1,6 @@
 ---
 name: using-super-adhd-child
 description: "Use when the user asks how to route work through the Super ADHD Child plugin, explicitly requests ADHD mode, or needs duplicate-installation guidance."
-license: MIT
 ---
 
 # Using Super ADHD Child

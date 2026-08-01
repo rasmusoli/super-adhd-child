@@ -20,7 +20,7 @@ Install this repository as the `super-adhd-child` Codex plugin. When using it, d
 
 ## Dependency boundary
 
-The first version contains skill and documentation files only. It does not bundle the ADHD CLI/library, Anthropic Agent SDK packages, hooks, or other runtime services.
+This plugin contains skill and documentation files only. It does not bundle the ADHD CLI/library, Anthropic Agent SDK packages, hooks, or other runtime services.
 
 ## Upstream attribution
 
