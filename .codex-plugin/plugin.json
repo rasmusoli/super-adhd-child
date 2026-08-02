@@ -1,6 +1,6 @@
 {
   "name": "super-adhd-child",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "description": "Superpowers development workflows with explicit ADHD divergent ideation for Codex.",
   "author": {
     "name": "redacted-user",
@@ -20,7 +20,7 @@
     "capabilities": ["Interactive", "Read", "Write"],
     "defaultPrompt": [
       "Let's build this with Superpowers.",
-      "Run /adhd on this open-ended design problem.",
+      "Use ADHD mode on this open-ended design problem.",
       "Help me move from the selected idea to a tested plan."
     ],
     "websiteURL": "https://example.invalid/super-adhd-child",

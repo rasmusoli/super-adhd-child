@@ -9,11 +9,15 @@ This plugin combines the Superpowers development methodology with ADHD divergent
 
 ## Routing policy
 
-- Use ADHD only for an explicit `/adhd` request, an explicit request for divergent ideation or parallel cognitive frames, or genuinely open-ended ideation where breadth is the actual need.
+- ADHD routing is manual-first: use it only for an explicit ADHD request, an explicit request for divergent ideation or parallel cognitive frames, or genuinely open-ended ideation where breadth is the actual need.
 - Do not use ADHD automatically for ordinary feature design, implementation planning, TDD, known-root-cause debugging, code review, or branch finishing.
 - ADHD performs divergent generation, scoring, clustering, trap detection, and deepening. It does not approve or implement a direction.
 - After the user selects a direction, hand it to `super-adhd-child:brainstorming` for the approved design gate.
 - `super-adhd-child:writing-plans`, `super-adhd-child:test-driven-development`, `super-adhd-child:systematic-debugging`, review skills, and branch-finishing skills remain authoritative for implementation and delivery.
+
+The plugin contains skills and does not register a host-level `/adhd` command.
+If a current Codex surface documents `/adhd` as a textual trigger, it may be
+used there; the portable invocation is: **"Use ADHD mode on <problem>."**
 
 ## Duplicate installations
 

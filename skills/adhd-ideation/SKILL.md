@@ -13,15 +13,20 @@ there.
 
 ## Pre-flight (run before Phase 1)
 
-This skill is expensive. About 10 Agent calls, 30 to 90 seconds wall clock,
-5 to 10x a single answer. Do not pay that cost when a direct answer is
-better. Run this gate before Phase 1.
+This skill is expensive. A default run has about 10 isolated-subagent roles
+and is often 5 to 10x the cost of a single answer, but wall-clock time and
+cost are estimates rather than guarantees. Capacity, queueing, model policy,
+and host performance change the result. Do not pay that cost when a direct
+answer is better. Run this gate before Phase 1.
 
 **Step 1. Explicit invocation check.**
 
-If the user typed `/adhd` or explicitly asked for ADHD mode, "use the
-adhd skill", or "run ADHD on this", **SKIP the rest of this section and go
-straight to Phase 1**. The user opted in. Do not second-guess.
+If the user explicitly asks for ADHD mode, says "use the ADHD skill", or says
+"run ADHD on this", **SKIP the rest of this section and go straight to Phase
+1**. The user opted in. Do not second-guess. This plugin contains skills and
+does not register a host-level `/adhd` command; treat `/adhd` as a textual
+trigger only when the current host documents that behavior. The portable
+invocation is: **"Use ADHD mode on <problem>."**
 
 **Step 2. Self-judge (only if Step 1 did not match).**
 
@@ -39,9 +44,9 @@ Ask yourself three questions. If the answer to any is no, ABORT.
 
 If all three checks pass, proceed to Phase 1.
 
-If any fails, ABORT and answer the question directly. Optionally append
-one sentence: *"If you want a wider exploration under parallel cognitive
-frames with explicit trap detection, run `/adhd <your problem>`."*
+If any fails, ABORT and answer the question directly. Optionally append one
+sentence: *"If you want a wider exploration under parallel cognitive frames
+with explicit trap detection, say: Use ADHD mode on <your problem>."*
 
 ## The loop
 
@@ -56,14 +61,27 @@ For the problem P:
    tags when the problem is code-shaped. Always include at least one wild
    frame to keep range.
 
-2. Spawn 5 **parallel** Agent/Task tool calls. One per frame. Each Agent
-   gets only:
-   - the problem P
-   - any context the user provided
-   - the chosen frame's vantage prompt
-   - a system instruction that forbids evaluation
+2. Detect whether the current host provides isolated subagents before
+   dispatching. Use the host's current capability discovery and terminology;
+   do not assume a fixed tool name or a five-worker limit. On Codex, this is
+   the current multi-agent collaboration capability, whose concrete
+   operation names are host-specific.
 
-   The exact instruction to give each Agent:
+   - If isolated subagents are available, read the actual concurrency limit
+     and launch no more branches than it permits. Run the five default frame
+     branches in capacity-sized batches. Each branch is isolated and receives
+     only:
+     - the problem P
+     - any context the user provided
+     - the chosen frame's vantage prompt
+     - a system instruction that forbids evaluation
+
+   - If isolated subagents are unavailable, explain that the full ADHD method
+     cannot preserve its isolation invariant. Do not pretend that sequential
+     root-context reasoning is equivalent. Stop and offer a direct answer or
+     ask the user whether to continue with a clearly labeled degraded mode.
+
+   The exact instruction to give each isolated subagent:
 
    > You are in DIVERGENT mode. You are a generator, not a critic.
    > Generate 6 short distinct ideas under this frame. Each idea is one
@@ -73,10 +91,11 @@ For the problem P:
    > Output a JSON array only. No prose before or after.
    > `[{"text": "...", "rationale": "..."}, ...]`
 
-3. **Critical invariant.** The Agent calls must be parallel and isolated.
-   Do NOT serialize them. Do NOT pass one branch's output as context to
-   another. Branches that see each other anchor each other and the whole
-   method collapses to a wider single thought.
+3. **Critical invariant.** Frame branches must remain isolated. Do NOT pass
+   one branch's output as context to another. Dispatch available branches in
+   parallel within the detected capacity, then continue with the next batch.
+   Branches that see each other anchor each other and the whole method
+   collapses to a wider single thought.
 
 ### Phase 2 — Focus (critic on)
 
@@ -94,14 +113,14 @@ After all branches return:
    backends plays".
 
 3. **Deepen the top 3.** Rank by weighted score (novelty 0.35 + viability
-   0.40 + fit 0.25), exclude traps, take top 3. For each, spawn one Agent
-   call that produces:
+   0.40 + fit 0.25), exclude traps, take top 3. For each, spawn one
+   isolated-subagent call that produces:
    - a 4 to 8 sentence sketch of how the idea works
    - the load-bearing risk
    - the first concrete step a builder would take
    - 3 to 5 child ideas (variations, hybrids, unlocks)
 
-   Deepen Agent instruction:
+   Deepen isolated-subagent instruction:
 
    > You are in FOCUS mode. Take one promising idea and connect dots.
    > Sketch how it would actually work in 4 to 8 sentences. Name the
@@ -180,8 +199,9 @@ These are how this skill goes wrong. Watch for them.
   Generate wide, but converge with a real opinion.
 - **Skipping the isolation invariant.** If you simulate parallel branches
   by writing them sequentially in one context, you have not done ADHD. You
-  have done a wider single thought. The Agent/Task tool gives each branch a
-  fresh context. Use it.
+  have done a wider single thought. Use the current host's isolated-subagent
+  capability; if it is unavailable, state that the invariant cannot be
+  preserved.
 
 ## Calibration
 
@@ -196,9 +216,21 @@ These are how this skill goes wrong. Watch for them.
 
 ## Cost
 
-5 diverge + 1 score + 1 cluster + 3 deepen ≈ 10 Agent calls per run.
-About 5 to 10x a single-shot answer. Not for every keystroke. For decision
-points where the cost of the obvious answer is high.
+5 diverge + 1 score + 1 cluster + 3 deepen is an estimate of about 10
+isolated-subagent roles per run. Actual time and cost vary with capacity,
+batching, model policy, and queueing; they are not guarantees. Not for every
+keystroke. Use it for decision points where the cost of the obvious answer
+is high.
+
+## Model and lifecycle policy
+
+Use an inherited model by default. Specify an override only when the
+current environment exposes model overrides and the user/platform policy
+permits them; never invent model names or override an explicit user
+constraint. Use the currently available subagent lifecycle operations for
+dispatch, waiting, continuation, and cleanup. Do not assume a fixed cleanup
+operation name. If cleanup is not exposed, let completed branches terminate
+naturally and report that limitation.
 
 ## Companion library and CLI
 
@@ -206,10 +238,8 @@ This Codex plugin intentionally does not bundle or require the ADHD CLI or
 library. The skill-first loop above is the complete plugin implementation;
 the upstream code, package files, and runtime dependencies are excluded.
 
-## Source spec
+## Packaging note
 
-This skill operationalises a written spec on divergent ideation. The
-original prose is preserved in `SOURCE-SPEC.md` for reference. The
-implementation choices made here (parallel isolated Agent calls,
-mechanical generator/critic split, frame-based branching) follow from
-that spec.
+This repository intentionally includes only this adapted ADHD skill. The
+upstream CLI, library, runtime dependencies, and any separate source-spec
+document are excluded from the package.

@@ -82,6 +82,8 @@ The combined plugin makes these changes to the upstream skill material:
 
 6. Adds a compact cross-cutting operational-patterns reference for objective-first execution, evidence-led action, conditional automation, operational fit, proportional communication, and applied learning.
 
-7. Keeps skill frontmatter limited to `name` and `description` without changing existing skill triggers.
+7. Keeps skill frontmatter limited to `name` and `description` while preserving the vendored skill inventory.
+8. Adds capability-aware ADHD execution guidance: isolated-subagent detection, capacity-sized batching, inherited model policy, and estimate-only timing/cost language.
+9. Clarifies that `/adhd` is not registered by this skills-only plugin and documents the portable explicit invocation.
 
 The plugin does not include the ADHD CLI/library or Anthropic Agent SDK dependencies. It also does not remove, alter, or uninstall any standalone ADHD or Superpowers installation.

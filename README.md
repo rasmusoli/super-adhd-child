@@ -1,27 +1,87 @@
 # Super ADHD Child
 
-Super ADHD Child is a dependency-free Codex plugin combining the Superpowers software-development methodology with the ADHD divergent-ideation skill.
+Super ADHD Child is a dependency-free Codex plugin combining the Superpowers
+software-development methodology with optional ADHD divergent ideation. The
+runtime boundary is skills and documentation only: no hooks, MCP servers,
+apps, CLI packages, external services, or installation-time dependencies.
 
-## Normal workflow
+## Routing
 
-Use the Superpowers skills for ordinary work: brainstorming and design approval, implementation planning, TDD, systematic debugging, parallel execution, code review, verification, and branch finishing.
+Ordinary planning, TDD, debugging, review, verification, and branch finishing
+remain governed by the Superpowers skills. ADHD is manual-first and activates
+only when the user explicitly asks for ADHD mode, divergent ideation, parallel
+cognitive frames, or trap-focused exploration. A selected ADHD direction is
+handed to `super-adhd-child:brainstorming`; ADHD does not approve or implement
+the direction.
 
-The internal skill references use the `super-adhd-child:` namespace so the vendored workflow stays self-contained.
+This plugin contains skills and does not register a host-level `/adhd`
+command. The portable invocation is:
 
-## ADHD mode
+> Use ADHD mode on: how should we design this?
 
-Run `/adhd <problem>` or explicitly ask for ADHD mode, divergent ideation, parallel cognitive frames, or trap-focused exploration.
+If a particular Codex surface documents `/adhd` as a textual trigger, that
+surface may accept it, but it is not supplied by this plugin's manifest.
 
-ADHD generates broadly, scores and clusters candidates, flags traps, and deepens survivors. It does not silently implement a candidate. When a direction is selected, continue with `super-adhd-child:brainstorming`, then use the Superpowers planning and implementation workflow.
+## Installation and duplicate installations
 
-## Installation and duplicate triggers
+Use the Codex host's verified plugin installation mechanism for the repository;
+there is no portable installer command in this project. The manifest exposes
+only `skills: "./skills/"`, so installation must not be inferred from a slash
+command. When this combined plugin is active, disable separate standalone ADHD
+and Superpowers installations to prevent duplicate triggers. Do not remove,
+overwrite, or modify those installations automatically.
 
-Install this repository as the `super-adhd-child` Codex plugin. When using it, disable separate standalone ADHD and Superpowers installations so their skills do not compete. This plugin never removes or changes those installations.
+## Local validation and packaging
 
-## Dependency boundary
+From any current working directory, invoke the scripts with the repository
+path (replace the placeholder with the checkout path):
 
-This plugin contains skill and documentation files only. It does not bundle the ADHD CLI/library, Anthropic Agent SDK packages, hooks, or other runtime services.
+```bash
+python3 /path/to/Super-ADHD-Child/scripts/validate_repo.py /path/to/Super-ADHD-Child
+python3 /path/to/Super-ADHD-Child/scripts/package_plugin.py /path/to/Super-ADHD-Child
+python3 /path/to/Super-ADHD-Child/scripts/package_plugin.py /path/to/Super-ADHD-Child --check
+```
 
-## Upstream attribution
+Run the test suite from the repository root with
+`python3 -m unittest discover -s tests -v`.
 
-See `THIRD_PARTY_NOTICES.md` for the pinned source commits, MIT notices, and local modifications.
+The validator runs the official Codex plugin validator when it is discoverable
+through `CODEX_OFFICIAL_VALIDATOR`, `CODEX_HOME`, or the standard user Codex
+skills path. Use `--skip-official` in offline CI when it is unavailable. The
+packager validates source first, writes a stable archive with normalized ZIP
+metadata, and replaces `skill.zip` only after validation succeeds. The archive
+is committed; `--check` proves it is fresh without modifying it.
+
+For the locally verified official audit, run:
+
+```bash
+python3 <local-root>/.codex/skills/.system/plugin-creator/scripts/validate_plugin.py .
+```
+
+## Upstream maintenance
+
+`UPSTREAM_INVENTORY.json` records repositories, pinned commits, vendored paths,
+namespace transformations, exclusions, and local modifications. Check for
+read-only drift with:
+
+```bash
+python3 scripts/check_upstream_drift.py
+```
+
+The drift checker may report a newer upstream commit or an inventory mismatch;
+it never updates vendored files. Refreshing upstream material is deliberate:
+review the new source, update the inventory and notices, reapply the local
+namespace/routing changes, run the full validation suite, and rebuild the
+archive. Do not rewrite historical design or implementation documents to make
+them match a later implementation.
+
+## Contribution workflow
+
+Create a feature branch, preserve unrelated work, write failing tests before
+changing behavior-shaping skills, make the smallest passing change, and review
+the diff for accidental vendored-content changes. Run validation, tests,
+syntax checks, archive freshness, and `git diff --check` before requesting
+review. Keep runtime changes inside this repository's documented boundary.
+
+See `THIRD_PARTY_NOTICES.md` for attribution and pinned source SHAs. See
+`CHANGELOG.md` for release-level changes.

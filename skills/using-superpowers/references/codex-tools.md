@@ -1,39 +1,44 @@
-## Subagent dispatch requires multi-agent support
+## Codex collaboration capability reference
 
-Add to your Codex config (`~/.codex/config.toml`):
+Use this reference when a workflow needs isolated subagents, parallel
+branches, continuation, or cleanup. Capability names are host-specific and
+must be checked in the current Codex surface before dispatching.
 
-```toml
-[features]
-multi_agent = true
-```
+### Detect before dispatch
 
-This enables `spawn_agent`, `wait_agent`, and `close_agent` for skills like `dispatching-parallel-agents` and `subagent-driven-development`. When using subagent-driven-development, close reviewer subagents when their review returns. Keep each implementer subagent open until its task's review passes — the fix loop resumes the implementer — then close it. If your harness cannot send another message to a spawned agent, dispatch each fix round as a fresh implementer carrying the brief, the report file, and the findings.
+- If the current surface exposes isolated subagents, use that capability and
+  read its actual concurrency limit. Run independent branches in
+  capacity-sized batches; never assume five workers are available.
+- If isolated subagents are unavailable, say so. A sequential root-context
+  simulation does not preserve an isolation invariant. Stop or offer a
+  clearly labeled degraded workflow; do not pretend it is equivalent.
+- Keep branch prompts independent. Do not pass one branch's output to another.
 
-## Environment Detection
+The local Codex desktop surface verified while maintaining this plugin exposed
+the `multi_agent_v1` spawn and wait operations. Treat those names as an
+observation for that surface, not as a portable plugin API. Other Codex
+surfaces may expose different operation names or no isolated-subagent support.
 
-Skills that create worktrees or finish branches should detect their
-environment with read-only git commands before proceeding:
+### Model policy
 
-```bash
-GIT_DIR=$(cd "$(git rev-parse --git-dir)" 2>/dev/null && pwd -P)
-GIT_COMMON=$(cd "$(git rev-parse --git-common-dir)" 2>/dev/null && pwd -P)
-BRANCH=$(git branch --show-current)
-```
+Inherit the current model by default. Specify a model override only when the
+current environment supports it and user/platform policy permits it. Never
+invent model names or override an explicit user constraint. Use task
+complexity to choose among permitted options, not to force a model selection.
 
-- `GIT_DIR != GIT_COMMON` → already in a linked worktree (skip creation)
-- `BRANCH` empty → detached HEAD (cannot branch/push/PR from sandbox)
+### Lifecycle and cleanup
 
-See `using-git-worktrees` Step 0 and `finishing-a-development-branch`
-Step 1 for how each skill uses these signals.
+Use the currently exposed operations for dispatch, waiting, continuation, and
+cleanup. Do not document or call a fixed cleanup operation name.
+If the current surface exposes cleanup, use it after the relevant branch or
+review completes. If it does not, wait for completion and let finished work
+terminate naturally, recording the limitation rather than editing Codex
+configuration.
 
-## Codex App Finishing
+### Local verification
 
-When the sandbox blocks branch/push operations (detached HEAD in an
-externally managed worktree), the agent commits all work and informs
-the user to use the App's native controls:
-
-- **"Create branch"** — names the branch, then commit/push/PR via App UI
-- **"Hand off to local"** — transfers work to the user's local checkout
-
-The agent can still run tests, stage files, and output suggested branch
-names, commit messages, and PR descriptions for the user to copy.
+Before changing this guidance, verify the local surface with read-only checks
+such as `codex --version`, the available collaboration capability, and the
+current repository branch/worktree state. Do not ask users to edit Codex
+configuration unless a setting is verified locally and is necessary for the
+requested workflow.

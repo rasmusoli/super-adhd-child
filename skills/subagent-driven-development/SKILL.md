@@ -174,9 +174,10 @@ small fix diffs take a cheap-to-mid tier.
 **Fix-loop escalation (rounds 4-5)**: use a model at least one tier above
 the implementer that got stuck.
 
-**Always specify the model explicitly when dispatching a subagent.** An
-omitted model inherits your session's model — often the most capable and
-most expensive — which silently defeats this section.
+**Do not require an explicit model when dispatching a subagent.** Inherit the
+current model by default. Specify an override only when the current
+environment supports it and user/platform policy permits it; never invent a
+model name or override an explicit user constraint.
 
 **Turn count beats token price.** Wall-clock and context cost scale with how
 many turns a subagent takes, and the cheapest models routinely take 2-3× the

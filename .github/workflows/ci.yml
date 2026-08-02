@@ -1,0 +1,26 @@
+name: Local repository checks
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  checks:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Validate repository
+        run: python3 scripts/validate_repo.py --skip-official
+      - name: Run tests
+        run: python3 -m unittest discover -s tests -v
+      - name: Check shell syntax
+        run: find . -type f -name '*.sh' -not -path './.git/*' -print0 | xargs -0 -r -n1 bash -n
+      - name: Check JavaScript syntax
+        run: find . -type f \( -name '*.js' -o -name '*.cjs' \) -not -path './.git/*' -print0 | xargs -0 -r -n1 node --check
+      - name: Check deterministic archive
+        run: python3 scripts/package_plugin.py --check --skip-official
+      - name: Check whitespace
+        run: git diff --check

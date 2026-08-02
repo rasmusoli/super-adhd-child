@@ -1,0 +1,56 @@
+{
+  "schemaVersion": 1,
+  "upstreams": [
+    {
+      "name": "superpowers",
+      "repository": "https://github.com/obra/superpowers",
+      "branch": "main",
+      "pinnedCommit": "44c9b2d6e889982ac18c27d05a19fefe335194e1",
+      "vendoredPaths": [
+        "skills/brainstorming/",
+        "skills/dispatching-parallel-agents/",
+        "skills/executing-plans/",
+        "skills/finishing-a-development-branch/",
+        "skills/receiving-code-review/",
+        "skills/requesting-code-review/",
+        "skills/subagent-driven-development/",
+        "skills/systematic-debugging/",
+        "skills/test-driven-development/",
+        "skills/using-git-worktrees/",
+        "skills/using-superpowers/",
+        "skills/verification-before-completion/",
+        "skills/writing-plans/",
+        "skills/writing-skills/"
+      ],
+      "localNamespaceTransformation": "Replace internal superpowers: skill identifiers with super-adhd-child:.",
+      "intentionalExclusions": [
+        "upstream hooks",
+        "upstream plugin manifests",
+        "package files and runtime dependencies",
+        "tests and development-only metadata"
+      ],
+      "locallyModifiedFiles": [
+        "skills/using-superpowers/references/codex-tools.md",
+        "skills/subagent-driven-development/SKILL.md",
+        "skills/using-superpowers/operational-patterns.md"
+      ],
+      "namespaceTransformedPaths": ["skills/**/*.md"]
+    },
+    {
+      "name": "adhd",
+      "repository": "https://github.com/UditAkhourii/adhd",
+      "branch": "main",
+      "pinnedCommit": "eaeba4e98b388b8d1d31a31572d91ff989e04c00",
+      "vendoredPaths": ["skills/adhd-ideation/SKILL.md"],
+      "localNamespaceTransformation": "Rename the upstream adhd skill to adhd-ideation; add combined-plugin routing and use the super-adhd-child: namespace.",
+      "intentionalExclusions": [
+        "upstream CLI and library",
+        "package files and runtime dependencies",
+        "upstream tests",
+        "separate source specification"
+      ],
+      "locallyModifiedFiles": ["skills/adhd-ideation/SKILL.md"],
+      "namespaceTransformedPaths": ["skills/adhd-ideation/SKILL.md"]
+    }
+  ]
+}
