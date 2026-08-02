@@ -58,7 +58,9 @@ digraph brainstorming {
 }
 ```
 
-**The terminal state is invoking writing-plans.** Do NOT invoke frontend-design, mcp-builder, or any other implementation skill. The ONLY skill you invoke after brainstorming is writing-plans.
+**The terminal state is invoking `super-adhd-child:writing-plans`.** Do not
+bypass that gate with an unshipped skill or another implementation skill. The
+only transition after brainstorming is `super-adhd-child:writing-plans`.
 
 ## The Process
 
@@ -106,7 +108,7 @@ digraph brainstorming {
 
 - Write the validated design (spec) to `docs/superpowers/specs/YYYY-MM-DD-<topic>-design.md`
   - (User preferences for spec location override this default)
-- Use elements-of-style:writing-clearly-and-concisely skill if available
+- Keep the written design concise and technically clear.
 - Commit the design document to git
 
 **Spec Self-Review:**

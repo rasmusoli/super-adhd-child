@@ -8,7 +8,7 @@ import subprocess
 import sys
 from pathlib import Path
 
-from repo_tools import find_repo_root
+from repo_tools import find_repo_root, inventory_exclusion_errors
 
 
 def _load_inventory(root: Path) -> tuple[dict | None, list[str]]:
@@ -21,9 +21,16 @@ def _load_inventory(root: Path) -> tuple[dict | None, list[str]]:
         return None, ["UPSTREAM_INVENTORY.json: expected schemaVersion 1 and an upstreams array"]
     errors: list[str] = []
     for entry in value["upstreams"]:
-        required = ("name", "repository", "branch", "pinnedCommit", "vendoredPaths", "localNamespaceTransformation", "intentionalExclusions", "locallyModifiedFiles")
-        if not isinstance(entry, dict) or any(not entry.get(field) for field in required):
-            errors.append("UPSTREAM_INVENTORY.json: every upstream needs repository, pin, paths, transformation, exclusions, and local modifications")
+        required = ("name", "repository", "branch", "pinnedCommit", "vendoredPaths", "localNamespaceTransformation", "intentionalExclusions", "locallyModifiedFiles", "excludedPaths")
+        if not isinstance(entry, dict) or any(not entry.get(field) for field in required[:-1]) or "excludedPaths" not in entry:
+            if isinstance(entry, dict) and isinstance(entry.get("excludedPaths"), list):
+                missing = [field for field in required[:-1] if not entry.get(field)]
+            else:
+                missing = list(required)
+            errors.append(
+                "UPSTREAM_INVENTORY.json: every upstream needs repository, pin, paths, transformation, exclusions, local modifications, and excludedPaths"
+                + (f" (missing {', '.join(missing)})" if missing else "")
+            )
             continue
         if not isinstance(entry["pinnedCommit"], str) or len(entry["pinnedCommit"]) != 40:
             errors.append(f"UPSTREAM_INVENTORY.json: invalid pinned commit for {entry.get('name', '<unknown>')}")
@@ -75,6 +82,7 @@ def main(argv: list[str] | None = None) -> int:
             print(f"- {error}")
         return 1
     errors.extend(_inventory_path_errors(root, inventory))
+    errors.extend(inventory_exclusion_errors(root, inventory))
     if errors:
         print(f"Upstream inventory: FAIL ({len(errors)} issue(s))")
         for error in errors:

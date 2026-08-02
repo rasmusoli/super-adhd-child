@@ -86,4 +86,9 @@ The combined plugin makes these changes to the upstream skill material:
 8. Adds capability-aware ADHD execution guidance: isolated-subagent detection, capacity-sized batching, inherited model policy, and estimate-only timing/cost language.
 9. Clarifies that `/adhd` is not registered by this skills-only plugin and documents the portable explicit invocation.
 
+10. Consolidates Codex collaboration capability, model, lifecycle, and local-verification guidance into `skills/using-superpowers/SKILL.md`; removes the redundant platform-reference bootstrap step.
+11. Keeps ADHD-specific isolation in `skills/adhd-ideation/SKILL.md` while moving scoring, trap detection, clustering, ranking, and selection inline to the orchestrator; the default accounting is five divergent roles plus three deepening roles.
+12. Removes five excluded debugging development files, records their exact paths in `UPSTREAM_INVENTORY.json`, and enforces the exclusion during validation, offline inventory checks, and deterministic packaging.
+13. Removes invalid skill references and redundant dispatch-skill worked examples while preserving the operative workflow gates and review contracts.
+
 The plugin does not include the ADHD CLI/library or Anthropic Agent SDK dependencies. It also does not remove, alter, or uninstall any standalone ADHD or Superpowers installation.

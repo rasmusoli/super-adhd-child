@@ -1,12 +1,15 @@
 import json
 import os
+import re
 import shutil
 import subprocess
 import tempfile
 import unittest
+import zipfile
 from pathlib import Path
 
 from scripts.repo_tools import (
+    _without_fenced_blocks,
     archive_matches_source,
     build_archive_bytes,
     package_repository,
@@ -163,6 +166,145 @@ class RepositoryToolsTests(unittest.TestCase):
         first = build_archive_bytes(ROOT)
         second = build_archive_bytes(ROOT)
         self.assertEqual(first, second)
+
+    def test_excluded_runtime_files_are_structured_and_absent(self):
+        inventory = json.loads((ROOT / "UPSTREAM_INVENTORY.json").read_text())
+        superpowers = next(entry for entry in inventory["upstreams"] if entry["name"] == "superpowers")
+        excluded = {
+            "skills/systematic-debugging/CREATION-LOG.md",
+            "skills/systematic-debugging/test-academic.md",
+            "skills/systematic-debugging/test-pressure-1.md",
+            "skills/systematic-debugging/test-pressure-2.md",
+            "skills/systematic-debugging/test-pressure-3.md",
+        }
+        self.assertEqual(set(superpowers.get("excludedPaths", [])), excluded)
+        self.assertTrue(all(not (ROOT / path).exists() for path in excluded))
+
+    def test_reintroduced_excluded_runtime_file_is_rejected(self):
+        temp_dir, root = self.copy_repository()
+        self.addCleanup(temp_dir.cleanup)
+        path = root / "skills" / "systematic-debugging" / "test-pressure-1.md"
+        path.write_text("reintroduced development-only fixture\n")
+        errors = validate_repository(root, run_official=False)
+        self.assertTrue(any("excluded" in error.lower() and "test-pressure-1.md" in error for error in errors))
+        with self.assertRaises(ValueError):
+            package_repository(root, official_validator=False)
+
+    def test_offline_inventory_check_rejects_reintroduced_excluded_file(self):
+        temp_dir, root = self.copy_repository()
+        self.addCleanup(temp_dir.cleanup)
+        path = root / "skills" / "systematic-debugging" / "test-pressure-1.md"
+        path.write_text("reintroduced development-only fixture\n")
+        result = subprocess.run(
+            ["python3", "scripts/check_upstream_drift.py", ".", "--offline"],
+            cwd=root,
+            text=True,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.STDOUT,
+            check=False,
+        )
+        self.assertNotEqual(result.returncode, 0, result.stdout)
+        self.assertIn("excluded runtime path is present", result.stdout)
+
+    def test_removed_debugging_files_are_not_in_archive(self):
+        names = set()
+        with zipfile.ZipFile(ROOT / "skill.zip") as archive:
+            names.update(archive.namelist())
+        for path in (
+            "skills/systematic-debugging/CREATION-LOG.md",
+            "skills/systematic-debugging/test-academic.md",
+            "skills/systematic-debugging/test-pressure-1.md",
+            "skills/systematic-debugging/test-pressure-2.md",
+            "skills/systematic-debugging/test-pressure-3.md",
+        ):
+            self.assertNotIn(path, names)
+
+    def test_codex_policy_is_authoritative_and_bootstrap_is_single_pass(self):
+        using_superpowers = (ROOT / "skills" / "using-superpowers" / "SKILL.md").read_text()
+        adhd = (ROOT / "skills" / "adhd-ideation" / "SKILL.md").read_text()
+        self.assertIn("Codex collaboration policy", using_superpowers)
+        self.assertIn("isolated subagents", using_superpowers.lower())
+        self.assertIn("capacity-sized batches", using_superpowers.lower())
+        self.assertIn("inherited model", using_superpowers.lower())
+        self.assertNotIn("Platform Adaptation", using_superpowers)
+        obsolete_reference = "codex-" + "tools.md"
+        self.assertFalse((ROOT / "skills" / "using-superpowers" / "references" / obsolete_reference).exists())
+        self.assertNotIn("## Model and lifecycle policy", adhd)
+        all_skill_text = "\n".join(path.read_text() for path in (ROOT / "skills").rglob("*.md"))
+        self.assertNotIn(obsolete_reference, all_skill_text)
+
+    def test_adhd_focus_evaluation_is_inline_and_uses_eight_roles(self):
+        adhd = (ROOT / "skills" / "adhd-ideation" / "SKILL.md").read_text()
+        phase_two = adhd.split("### Phase 2", 1)[1].split("## Frames", 1)[0]
+        lowered = adhd.lower()
+        phase_two_lower = phase_two.lower()
+        self.assertIn("about 8 isolated-subagent roles", lowered)
+        self.assertIn("five divergent", lowered)
+        self.assertIn("three deepening", lowered)
+        for marker in ("orchestrator", "score", "trap", "cluster", "weighted", "top 3", "inline"):
+            self.assertIn(marker, phase_two_lower)
+        self.assertNotIn("+ 1 score + 1 cluster", lowered)
+        self.assertNotRegex(phase_two_lower, r"(?:spawn|dispatch)[^\n]*(?:score|cluster)")
+
+    def test_missing_namespaced_skill_references_are_rejected(self):
+        temp_dir, root = self.copy_repository()
+        self.addCleanup(temp_dir.cleanup)
+        skill = root / "skills" / "using-superpowers" / "SKILL.md"
+        skill.write_text(skill.read_text() + "\nRequired: super-adhd-child:not-shipped.\n")
+        errors = validate_repository(root, run_official=False)
+        self.assertTrue(any("not-shipped" in error and "skill" in error.lower() for error in errors))
+
+    def test_fenced_missing_namespaced_skill_reference_is_ignored(self):
+        temp_dir, root = self.copy_repository()
+        self.addCleanup(temp_dir.cleanup)
+        skill = root / "skills" / "using-superpowers" / "SKILL.md"
+        skill.write_text(skill.read_text() + "\n```text\nsuper-adhd-child:not-shipped\n```\n")
+        errors = validate_repository(root, run_official=False)
+        self.assertFalse(any("not-shipped" in error for error in errors))
+
+    def test_nonexistent_skill_names_are_removed_and_brainstorming_gate_remains(self):
+        using_superpowers = (ROOT / "skills" / "using-superpowers" / "SKILL.md").read_text()
+        brainstorming = (ROOT / "skills" / "brainstorming" / "SKILL.md").read_text()
+        invalid_design_skill = "front" + "end-design"
+        invalid_builder_skill = "mcp-" + "builder"
+        self.assertNotIn(invalid_design_skill, using_superpowers)
+        self.assertNotIn(invalid_design_skill, brainstorming)
+        self.assertNotIn(invalid_builder_skill, brainstorming)
+        self.assertIn("super-adhd-child:writing-plans", brainstorming)
+        self.assertIn("only transition", brainstorming)
+
+    def test_dispatch_hot_paths_drop_redundant_examples_and_openings(self):
+        dispatch = (ROOT / "skills" / "dispatching-parallel-agents" / "SKILL.md").read_text()
+        development = (ROOT / "skills" / "subagent-driven-development" / "SKILL.md").read_text()
+        self.assertNotIn("## Real Example from Session", dispatch)
+        self.assertNotIn("## Example Workflow", development)
+        self.assertLess(len(dispatch.split()), 865)
+        self.assertLess(len(development.split()), 4084)
+        self.assertIn("independent", dispatch.lower())
+        self.assertIn("fresh per-task", development.lower())
+        for heading, text in (("Real Example from Session", dispatch), ("Example Workflow", development)):
+            if heading in text:
+                self.assertRegex(text, r"(?is)conditional.{0,120}\[[^]]+\]\([^)]*\)")
+
+    def test_manual_first_routing_and_brainstorming_handoff_remain(self):
+        router = (ROOT / "skills" / "using-super-adhd-child" / "SKILL.md").read_text().lower()
+        adhd = (ROOT / "skills" / "adhd-ideation" / "SKILL.md").read_text()
+        self.assertIn("manual-first", router)
+        self.assertIn("do not use adhd automatically", router)
+        self.assertIn("super-adhd-child:brainstorming", router)
+        self.assertIn("super-adhd-child:brainstorming", adhd)
+
+    def test_namespaced_skill_references_resolve_to_shipped_skills(self):
+        skill_names = {
+            path.parent.name
+            for path in (ROOT / "skills").glob("*/SKILL.md")
+        }
+        pattern = re.compile(r"\b([a-z][a-z0-9-]*-[a-z0-9-]+):([a-z0-9-]+)\b")
+        for path in (ROOT / "skills").rglob("*.md"):
+            text = _without_fenced_blocks(path.read_text())
+            for namespace, reference in pattern.findall(text):
+                self.assertEqual(namespace, "super-adhd-child", f"unshipped namespace in {path}: {namespace}")
+                self.assertIn(reference, skill_names, f"unshipped skill reference in {path}: {reference}")
 
 
 if __name__ == "__main__":

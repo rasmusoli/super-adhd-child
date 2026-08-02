@@ -30,9 +30,19 @@
         "tests and development-only metadata"
       ],
       "locallyModifiedFiles": [
-        "skills/using-superpowers/references/codex-tools.md",
+        "skills/using-superpowers/SKILL.md",
         "skills/subagent-driven-development/SKILL.md",
-        "skills/using-superpowers/operational-patterns.md"
+        "skills/using-superpowers/operational-patterns.md",
+        "skills/writing-skills/SKILL.md",
+        "skills/dispatching-parallel-agents/SKILL.md",
+        "skills/brainstorming/SKILL.md"
+      ],
+      "excludedPaths": [
+        "skills/systematic-debugging/CREATION-LOG.md",
+        "skills/systematic-debugging/test-academic.md",
+        "skills/systematic-debugging/test-pressure-1.md",
+        "skills/systematic-debugging/test-pressure-2.md",
+        "skills/systematic-debugging/test-pressure-3.md"
       ],
       "namespaceTransformedPaths": ["skills/**/*.md"]
     },
@@ -50,6 +60,7 @@
         "separate source specification"
       ],
       "locallyModifiedFiles": ["skills/adhd-ideation/SKILL.md"],
+      "excludedPaths": [],
       "namespaceTransformedPaths": ["skills/adhd-ideation/SKILL.md"]
     }
   ]

@@ -72,6 +72,52 @@ FRONTMATTER_FIELD = re.compile(r"^([A-Za-z][A-Za-z0-9_-]*):\s*(.*)$")
 LINK = re.compile(r"(?<!!)\[[^\]]*\]\(([^)\s]+)(?:\s+[\"'][^\"']*[\"'])?\)")
 INLINE_PATH = re.compile(r"^[A-Za-z0-9_.-]+(?:/[A-Za-z0-9_.-]+)*\.[A-Za-z0-9]+$")
 SHA = re.compile(r"\b[0-9a-f]{40}\b")
+NAMESPACED_SKILL = re.compile(r"\b([a-z][a-z0-9-]*-[a-z0-9-]+):([a-z0-9-]+)\b")
+
+
+def inventory_exclusion_errors(root: Path | str, inventory: dict) -> list[str]:
+    """Validate machine-readable runtime exclusions and reject reintroduced paths."""
+
+    root = Path(root).resolve()
+    errors: list[str] = []
+    for entry in inventory.get("upstreams", []):
+        if not isinstance(entry, dict):
+            continue
+        excluded = entry.get("excludedPaths")
+        if not isinstance(excluded, list):
+            errors.append(
+                f"UPSTREAM_INVENTORY.json: excludedPaths must be a list for {entry.get('name', '<unknown>')}"
+            )
+            continue
+        for value in excluded:
+            if not isinstance(value, str) or not value or Path(value).is_absolute():
+                errors.append(
+                    f"UPSTREAM_INVENTORY.json: excluded path must be a relative nonempty string: {value!r}"
+                )
+                continue
+            relative = Path(value)
+            if ".." in relative.parts or not value.startswith("skills/"):
+                errors.append(f"UPSTREAM_INVENTORY.json: excluded path must stay beneath skills/: {value}")
+                continue
+            if not (root / relative).parent.is_dir():
+                errors.append(f"UPSTREAM_INVENTORY.json: excluded path parent is missing: {value}")
+            if (root / relative).exists():
+                errors.append(f"{value}: excluded runtime path is present")
+    return errors
+
+
+def declared_excluded_paths(root: Path | str) -> set[str]:
+    """Return declared excluded paths for archive defense-in-depth."""
+
+    try:
+        inventory = json.loads((Path(root).resolve() / "UPSTREAM_INVENTORY.json").read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError):
+        return set()
+    paths: set[str] = set()
+    for entry in inventory.get("upstreams", []) if isinstance(inventory, dict) else []:
+        if isinstance(entry, dict) and isinstance(entry.get("excludedPaths"), list):
+            paths.update(value for value in entry["excludedPaths"] if isinstance(value, str))
+    return paths
 
 
 def find_repo_root(start: Path | str | None = None) -> Path:
@@ -222,10 +268,13 @@ def _support_script_errors(root: Path) -> list[str]:
 
 def _archive_members(root: Path) -> list[tuple[str, Path | None]]:
     excluded_directories = {"__pycache__", ".pytest_cache", ".mypy_cache", ".ruff_cache", ".cache"}
+    excluded_paths = declared_excluded_paths(root)
 
     def excluded(path: Path) -> bool:
         relative = path.relative_to(root)
         if any(part in excluded_directories for part in relative.parts):
+            return True
+        if relative.as_posix() in excluded_paths:
             return True
         return path.name in {".DS_Store"} or path.name.endswith((".pyc", ".tmp", ".swp", "~"))
 
@@ -400,23 +449,23 @@ def _source_and_routing_errors(root: Path) -> list[str]:
         if "https://github.com/obra/superpowers" not in notice_text or "https://github.com/UditAkhourii/adhd" not in notice_text:
             errors.append("THIRD_PARTY_NOTICES.md: upstream repository attribution is incomplete")
     router = root / "skills" / "using-super-adhd-child" / "SKILL.md"
+    collaboration = root / "skills" / "using-superpowers" / "SKILL.md"
     adhd = root / "skills" / "adhd-ideation" / "SKILL.md"
     router_text = router.read_text(encoding="utf-8") if router.is_file() else ""
+    collaboration_text = collaboration.read_text(encoding="utf-8") if collaboration.is_file() else ""
     adhd_text = adhd.read_text(encoding="utf-8") if adhd.is_file() else ""
-    router_lower = router_text.lower()
+    router_lower = " ".join(router_text.lower().split())
+    collaboration_lower = " ".join(collaboration_text.lower().split())
+    adhd_lower = " ".join(adhd_text.lower().split())
     if "manual-first" not in router_lower or "do not use adhd automatically" not in router_lower:
         errors.append("using-super-adhd-child: manual-first routing contract is missing")
     if "super-adhd-child:brainstorming" not in router_text or "super-adhd-child:brainstorming" not in adhd_text:
         errors.append("using-super-adhd-child: ADHD-to-brainstorming handoff is missing")
-    capability_markers = (
-        "isolated subagents are unavailable",
-        "capacity-sized batches",
-        "inherited model",
-        "estimates rather than guarantees",
-    )
-    for marker in capability_markers:
-        if marker not in adhd_text.lower():
+    for marker in ("isolated subagents are unavailable", "capacity-sized batches", "estimates rather than guarantees"):
+        if marker not in adhd_lower:
             errors.append(f"adhd-ideation: capability-aware guidance is missing: {marker}")
+    if "inherited model" not in collaboration_lower:
+        errors.append("using-superpowers: capability-aware guidance is missing: inherited model")
     if "/adhd" in (root / "README.md").read_text(encoding="utf-8") and "does not register" not in (root / "README.md").read_text(encoding="utf-8"):
         errors.append("README.md: /adhd must be described as unregistered or textual, not as a host command")
     return errors
@@ -447,6 +496,8 @@ def _inventory_errors(root: Path) -> list[str]:
         if not isinstance(entry, dict) or any(not entry.get(field) for field in fields):
             errors.append("UPSTREAM_INVENTORY.json: every upstream needs structured attribution and maintenance fields")
             continue
+        if "excludedPaths" not in entry:
+            errors.append(f"UPSTREAM_INVENTORY.json: excludedPaths is missing for {entry.get('name', '<unknown>')}")
         if not isinstance(entry["pinnedCommit"], str) or not SHA.fullmatch(entry["pinnedCommit"]):
             errors.append(f"UPSTREAM_INVENTORY.json: invalid pinned commit for {entry['name']}")
         for value in entry["vendoredPaths"] + entry["locallyModifiedFiles"]:
@@ -455,6 +506,7 @@ def _inventory_errors(root: Path) -> list[str]:
                     errors.append(f"UPSTREAM_INVENTORY.json: path pattern matches nothing: {value}")
             elif not (root / value.rstrip("/")).exists():
                 errors.append(f"UPSTREAM_INVENTORY.json: referenced path is missing: {value}")
+    errors.extend(inventory_exclusion_errors(root, inventory))
     return errors
 
 
@@ -481,6 +533,24 @@ def _namespace_errors(root: Path) -> list[str]:
     return errors
 
 
+def _skill_reference_errors(root: Path) -> list[str]:
+    """Reject namespaced references that do not resolve to shipped skills."""
+
+    shipped = {
+        path.parent.name
+        for path in (root / "skills").glob("*/SKILL.md")
+    }
+    errors: list[str] = []
+    for path in _packaged_markdown(root):
+        visible = _without_fenced_blocks(path.read_text(encoding="utf-8"))
+        for namespace, name in NAMESPACED_SKILL.findall(visible):
+            if namespace != "super-adhd-child" or name not in shipped:
+                errors.append(
+                    f"{path.relative_to(root)}: namespaced skill reference is not shipped: {namespace}:{name}"
+                )
+    return errors
+
+
 def validate_repository(
     root: Path | str,
     *,
@@ -500,6 +570,7 @@ def validate_repository(
     errors.extend(_source_and_routing_errors(root))
     errors.extend(_inventory_errors(root))
     errors.extend(_namespace_errors(root))
+    errors.extend(_skill_reference_errors(root))
     errors.extend(_support_script_errors(root))
     for markdown in _packaged_markdown(root):
         errors.extend(_relative_link_errors(markdown, root))

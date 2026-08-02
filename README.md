@@ -22,6 +22,11 @@ command. The portable invocation is:
 If a particular Codex surface documents `/adhd` as a textual trigger, that
 surface may accept it, but it is not supplied by this plugin's manifest.
 
+An explicit ADHD run uses five isolated divergent frame roles followed by
+three isolated deepening roles. The root orchestrator scores, labels traps,
+clusters, ranks, and selects candidates inline after divergence; it does not
+dispatch separate scoring or clustering roles.
+
 ## Installation and duplicate installations
 
 Use the Codex host's verified plugin installation mechanism for the repository;
@@ -51,6 +56,9 @@ skills path. Use `--skip-official` in offline CI when it is unavailable. The
 packager validates source first, writes a stable archive with normalized ZIP
 metadata, and replaces `skill.zip` only after validation succeeds. The archive
 is committed; `--check` proves it is fresh without modifying it.
+Inventory-declared runtime exclusions and namespaced skill references are
+machine-checked, so reintroduced excluded files or references to unshipped
+skills fail validation before packaging.
 
 For the locally verified official audit, run:
 

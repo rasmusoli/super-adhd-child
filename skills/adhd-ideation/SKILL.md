@@ -13,11 +13,12 @@ there.
 
 ## Pre-flight (run before Phase 1)
 
-This skill is expensive. A default run has about 10 isolated-subagent roles
-and is often 5 to 10x the cost of a single answer, but wall-clock time and
-cost are estimates rather than guarantees. Capacity, queueing, model policy,
-and host performance change the result. Do not pay that cost when a direct
-answer is better. Run this gate before Phase 1.
+This skill is expensive. A default run has about 8 isolated-subagent roles:
+five divergent frame roles plus three deepening roles. It is often 5 to 10x
+the cost of a single answer, but wall-clock time and cost are estimates rather
+than guarantees. Capacity, queueing, model policy, and host performance change
+the result. Do not pay that cost when a direct answer is better. Run this gate
+before Phase 1.
 
 **Step 1. Explicit invocation check.**
 
@@ -99,9 +100,14 @@ For the problem P:
 
 ### Phase 2 — Focus (critic on)
 
-After all branches return:
+After all branches return, the root orchestrator owns the complete candidate
+pool and final response. Keep the Phase 1 generator/critic separation: no
+branch evaluates another branch, and the orchestrator activates criticism only
+now. Perform the following work inline in the current turn; do not dispatch
+isolated subagents for scoring, trap detection, clustering, ranking, or
+selection.
 
-1. **Score.** Rate each idea on three axes 0 to 10: novelty (distance from
+1. **Score and detect traps.** Rate each idea on three axes 0 to 10: novelty (distance from
    the obvious default), viability (could it actually ship), fit (does it
    address the stated problem). For any idea that looks attractive but is
    a trap (hidden cost, false economy, will not scale, premature
@@ -112,9 +118,10 @@ After all branches return:
    plays", "cache-shaped plays", "batched-window plays", "race-multiple-
    backends plays".
 
-3. **Deepen the top 3.** Rank by weighted score (novelty 0.35 + viability
-   0.40 + fit 0.25), exclude traps, take top 3. For each, spawn one
-   isolated-subagent call that produces:
+3. **Rank and select.** Calculate the weighted score (novelty 0.35 + viability
+   0.40 + fit 0.25), exclude traps, and select the top 3. Then dispatch exactly
+   three independent deepening roles, one for each selected candidate. Each
+   deepening role produces:
    - a 4 to 8 sentence sketch of how the idea works
    - the load-bearing risk
    - the first concrete step a builder would take
@@ -216,21 +223,19 @@ These are how this skill goes wrong. Watch for them.
 
 ## Cost
 
-5 diverge + 1 score + 1 cluster + 3 deepen is an estimate of about 10
+Five divergence roles plus three deepening roles is an estimate of about 8
 isolated-subagent roles per run. Actual time and cost vary with capacity,
 batching, model policy, and queueing; they are not guarantees. Not for every
 keystroke. Use it for decision points where the cost of the obvious answer
 is high.
 
-## Model and lifecycle policy
+## ADHD isolation policy
 
-Use an inherited model by default. Specify an override only when the
-current environment exposes model overrides and the user/platform policy
-permits them; never invent model names or override an explicit user
-constraint. Use the currently available subagent lifecycle operations for
-dispatch, waiting, continuation, and cleanup. Do not assume a fixed cleanup
-operation name. If cleanup is not exposed, let completed branches terminate
-naturally and report that limitation.
+Use the collaboration and lifecycle policy established by
+`super-adhd-child:using-superpowers`. ADHD-specific isolation still requires
+five independent divergence branches and three independent deepening branches;
+if the host cannot provide isolated subagents, stop or offer a clearly labeled
+degraded alternative rather than simulating isolation in the root context.
 
 ## Companion library and CLI
 

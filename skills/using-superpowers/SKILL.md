@@ -25,9 +25,9 @@ Then announce "Using [skill] to [purpose]" and follow the skill exactly. If it h
 
 ## Skill Priority
 
-When multiple skills apply, process skills come first — they set the approach, then implementation skills (frontend-design, etc.) carry it out. Brainstorming and systematic-debugging are Superpowers' most common process skills, but the rule holds for any of them.
+When multiple skills apply, process skills come first — they set the approach, then domain skills carry it out. Brainstorming and systematic-debugging are Superpowers' most common process skills, but the rule holds for any of them.
 
-- "Let's build X" → super-adhd-child:brainstorming first, then implementation skills.
+- "Let's build X" → super-adhd-child:brainstorming first, then domain skills.
 - "Fix this bug" → super-adhd-child:systematic-debugging first, then domain skills.
 
 ## Operational Defaults
@@ -37,6 +37,26 @@ or learning tasks, read [`operational-patterns.md`](operational-patterns.md) and
 apply only the relevant guidance. It is a compact decision aid, not a mandatory
 workflow: simple tasks stay direct; material-risk tasks get explicit assumptions,
 rollback, and verification.
+
+## Codex collaboration policy
+
+When a workflow needs isolated subagents, detect the capability exposed by the
+current Codex surface and read its actual concurrency limit. Use independent
+branches in capacity-sized batches; never assume five workers or a fixed
+operation name. If isolated subagents are unavailable, say so: sequential
+root-context reasoning is not equivalent isolation. Stop or offer a clearly
+labeled degraded workflow, and never pretend it preserves the invariant.
+
+Keep branch prompts independent and do not pass one branch's output to another.
+Use the inherited model by default. Specify an override only when the
+environment exposes it and user/platform policy permits it; never invent model
+names or override an explicit constraint. Use the currently exposed operations
+for dispatch, waiting, continuation, and cleanup. If cleanup is unavailable,
+let completed branches terminate naturally and report that limitation.
+
+Before changing this guidance, use local read-only checks such as
+`codex --version`, the available collaboration capability, and the current
+repository branch/worktree state.
 
 ## Red Flags
 
@@ -56,14 +76,6 @@ These thoughts mean STOP—you're rationalizing:
 | "I'll just do this one thing first" | Check BEFORE doing anything. |
 | "This feels productive" | Undisciplined action wastes time. Skills prevent this. |
 | "I know what that means" | Knowing the concept ≠ using the skill. Invoke it. |
-
-## Platform Adaptation
-
-If your harness appears here, read its reference file for special instructions:
-
-- Codex: `references/codex-tools.md`
-- Pi: `references/pi-tools.md`
-- Antigravity: `references/antigravity-tools.md`
 
 ## User Instructions
 
