@@ -40,6 +40,12 @@ rollback, and verification.
 
 ## Codex collaboration policy
 
+When Super ADHD Child is the active plugin, treat capability-aware subagent
+delegation as the default for independently separable work, including
+exploration, tests, review, documentation, and implementation sidecars; do not
+wait for a second user request to delegate. Keep trivial or tightly coupled
+work inline, and never spawn ceremonial agents.
+
 When a workflow needs isolated subagents, detect the capability exposed by the
 current Codex surface and read its actual concurrency limit. Use independent
 branches in capacity-sized batches; never assume five workers or a fixed
