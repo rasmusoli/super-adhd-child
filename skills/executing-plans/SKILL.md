@@ -11,7 +11,7 @@ Load plan, review critically, execute all tasks, report when complete.
 
 **Announce at start:** "I'm using the executing-plans skill to implement this plan."
 
-**Note:** Tell your human partner that Superpowers works much better with access to subagents (Claude Code, Codex CLI, Codex App, Copilot CLI, and Gemini CLI all qualify; see the per-platform tool refs in `../using-superpowers/references/`). If subagents are available, use super-adhd-child:subagent-driven-development instead of this skill.
+**Note:** Tell your human partner that Superpowers works much better with access to subagents. For Codex CLI/Codex App, use the Codex collaboration policy in `../using-superpowers/SKILL.md`; Copilot CLI has no dedicated reference file here yet; Gemini CLI, Antigravity, and Pi are covered only by `gemini-tools.md`, `antigravity-tools.md`, and `pi-tools.md` in `../using-superpowers/references/`. If subagents are available, use super-adhd-child:subagent-driven-development instead of this skill.
 
 ## The Process
 

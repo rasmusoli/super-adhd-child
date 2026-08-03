@@ -226,12 +226,31 @@ class RepositoryToolsTests(unittest.TestCase):
         self.assertIn("isolated subagents", using_superpowers.lower())
         self.assertIn("capacity-sized batches", using_superpowers.lower())
         self.assertIn("inherited model", using_superpowers.lower())
+        normalized_policy = " ".join(using_superpowers.split())
+        self.assertIn("general-purpose", normalized_policy)
+        self.assertIn("`default` built-in agent", normalized_policy)
+        self.assertIn("`worker`", normalized_policy)
+        self.assertIn("`explorer`", normalized_policy)
+        self.assertIn("direct natural-language", normalized_policy)
+        self.assertIn("not a formal tool call", normalized_policy)
         self.assertNotIn("Platform Adaptation", using_superpowers)
         obsolete_reference = "codex-" + "tools.md"
         self.assertFalse((ROOT / "skills" / "using-superpowers" / "references" / obsolete_reference).exists())
         self.assertNotIn("## Model and lifecycle policy", adhd)
         all_skill_text = "\n".join(path.read_text() for path in (ROOT / "skills").rglob("*.md"))
         self.assertNotIn(obsolete_reference, all_skill_text)
+
+    def test_executing_plans_names_only_shipped_host_references(self):
+        executing_plans = (ROOT / "skills" / "executing-plans" / "SKILL.md").read_text()
+        self.assertIn(
+            "Codex CLI/Codex App, use the Codex collaboration policy in `../using-superpowers/SKILL.md`",
+            executing_plans,
+        )
+        self.assertIn("Copilot CLI has no dedicated reference file here yet", executing_plans)
+        for reference in ("gemini-tools.md", "antigravity-tools.md", "pi-tools.md"):
+            self.assertIn(reference, executing_plans)
+        self.assertNotIn("codex-tools.md", executing_plans)
+        self.assertNotIn("copilot-tools.md", executing_plans)
 
     def test_adhd_focus_evaluation_is_inline_and_uses_eight_roles(self):
         adhd = (ROOT / "skills" / "adhd-ideation" / "SKILL.md").read_text()

@@ -47,6 +47,12 @@ operation name. If isolated subagents are unavailable, say so: sequential
 root-context reasoning is not equivalent isolation. Stop or offer a clearly
 labeled degraded workflow, and never pretend it preserves the invariant.
 
+On Codex, `Subagent (general-purpose):` is a cross-platform template marker:
+it maps to Codex's `default` built-in agent. `worker` and `explorer` are
+available for read-write and read-only splits. Dispatch by writing a direct
+natural-language delegation instruction (for example, `Spawn a subagent:
+<task>. Wait for it, then report back <X>.`), not a formal tool call.
+
 Keep branch prompts independent and do not pass one branch's output to another.
 Use the inherited model by default. Specify an override only when the
 environment exposes it and user/platform policy permits it; never invent model

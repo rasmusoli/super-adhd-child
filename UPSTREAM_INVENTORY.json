@@ -35,7 +35,8 @@
         "skills/using-superpowers/operational-patterns.md",
         "skills/writing-skills/SKILL.md",
         "skills/dispatching-parallel-agents/SKILL.md",
-        "skills/brainstorming/SKILL.md"
+        "skills/brainstorming/SKILL.md",
+        "skills/executing-plans/SKILL.md"
       ],
       "excludedPaths": [
         "skills/systematic-debugging/CREATION-LOG.md",
