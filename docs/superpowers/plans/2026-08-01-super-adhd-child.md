@@ -27,7 +27,7 @@
 
 Files:
 - Create: skills/brainstorming/ and the other 13 requested Superpowers skill directories, preserving each upstream directory's nested files.
-- Source: <temporary-source-root>/superpowers/ at the pinned commit, or a fresh checkout of the same commit if that temporary source is unavailable.
+- Source: `<temporary-source-root>/superpowers/` at the pinned commit, or a fresh checkout of the same commit if that temporary source is unavailable.
 
 Interfaces:
 - Consumes: the pinned Superpowers repository and the skill list in Global Constraints.
@@ -103,7 +103,7 @@ Expected: a commit containing only the selected Superpowers skill tree.
 Files:
 - Create: skills/adhd-ideation/SKILL.md
 - Create: skills/using-super-adhd-child/SKILL.md
-- Source: <temporary-source-root>/adhd/skills/adhd/SKILL.md at the pinned commit.
+- Source: `<temporary-source-root>/adhd/skills/adhd/SKILL.md` at the pinned commit.
 
 Interfaces:
 - Consumes: the upstream ADHD skill and the namespaced Superpowers skills from Task 1.
@@ -229,8 +229,8 @@ Create .codex-plugin/plugin.json with this exact shape:
   "version": "1.0.0",
   "description": "Superpowers development workflows with explicit ADHD divergent ideation for Codex.",
   "author": {
-    "name": "redacted-user",
-    "url": "https://example.invalid"
+    "name": "Plugin Maintainers",
+    "url": "https://example.invalid/super-adhd-child"
   },
   "homepage": "https://example.invalid/super-adhd-child",
   "repository": "https://example.invalid/super-adhd-child",
@@ -241,7 +241,7 @@ Create .codex-plugin/plugin.json with this exact shape:
     "displayName": "Super ADHD Child",
     "shortDescription": "Superpowers workflows with explicit divergent ideation",
     "longDescription": "Use Super ADHD Child for disciplined brainstorming, planning, TDD, debugging, review, delivery, and optional ADHD divergent exploration that hands selected directions back to Superpowers.",
-    "developerName": "redacted-user",
+    "developerName": "Plugin Maintainers",
     "category": "Developer Tools",
     "capabilities": ["Interactive", "Read", "Write"],
     "defaultPrompt": [
@@ -290,7 +290,7 @@ See THIRD_PARTY_NOTICES.md for the pinned source commits, MIT notices, and local
 - [ ] Step 4: Run manifest-level checks before committing the documentation layer.
 
 ~~~bash
-python3 <local-root>/.codex/skills/.system/plugin-creator/scripts/validate_plugin.py .
+Run the official plugin validator from the active Codex installation against the checkout.
 git diff --check
 ~~~
 
@@ -309,7 +309,7 @@ Expected: a commit containing the manifest, README, license, and notices.
 
 Files:
 - Test: the current plugin tree and all committed files.
-- Reference: <local-root>/.codex/skills/.system/plugin-creator/scripts/validate_plugin.py.
+- Reference: the official validator in the local Codex installation.
 
 Interfaces:
 - Consumes: the plugin assembled by Tasks 1–3.
@@ -318,10 +318,10 @@ Interfaces:
 - [ ] Step 1: Run the official plugin validator.
 
 ~~~bash
-python3 <local-root>/.codex/skills/.system/plugin-creator/scripts/validate_plugin.py .
+Run the official plugin validator from the active Codex installation against the checkout.
 ~~~
 
-Expected: Plugin validation passed for <plugin-root>.
+Expected: the official plugin validator reports success for the checkout.
 
 - [ ] Step 2: Verify the complete expected skill set and frontmatter.
 
@@ -404,7 +404,7 @@ Files:
 
 Interfaces:
 - Consumes: a clean, validated local branch.
-- Produces: codex/super-adhd-child on https://example.invalid/super-adhd-child and verifiable remote commit evidence.
+- Produces: the selected publication branch and verifiable remote commit evidence.
 
 - [ ] Step 1: Confirm the exact branch and clean state.
 
@@ -436,7 +436,7 @@ Expected: GitHub accepts a new branch at local HEAD without any force-push optio
 
 ~~~bash
 git ls-remote --heads origin codex/super-adhd-child
-gh api repos/redacted-user/super-adhd-child/branches/codex/super-adhd-child --jq '.name + " " + .commit.sha'
+gh api repos/OWNER/REPOSITORY/branches/codex/super-adhd-child --jq '.name + " " + .commit.sha'
 ~~~
 
 Expected: both commands report codex/super-adhd-child and the same commit SHA as local git rev-parse HEAD.

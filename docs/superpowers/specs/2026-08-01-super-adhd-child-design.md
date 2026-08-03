@@ -34,7 +34,7 @@ The `using-super-adhd-child` description is narrow enough to avoid competing wit
 
 - use `name: "super-adhd-child"` and strict semantic version `1.0.0`;
 - point `skills` to `./skills/`;
-- use MIT metadata and the target repository as the repository/homepage;
+- use MIT metadata and a neutral placeholder for repository/homepage fields;
 - provide a clear `Super ADHD Child` interface description and starter prompts;
 - contain no `hooks`, MCP, app, or unsupported manifest fields.
 
@@ -50,12 +50,12 @@ The manifest will not reference assets that are not shipped. A root `LICENSE` wi
 
 Validation will combine the plugin-creator validator with repository-specific checks:
 
-1. Validate `.codex-plugin/plugin.json` using `python <local-root>/.codex/skills/.system/plugin-creator/scripts/validate_plugin.py .`.
+1. Validate `.codex-plugin/plugin.json` using the official validator from the local Codex installation.
 2. Verify all 16 expected skills have frontmatter and `SKILL.md` files.
 3. Verify every nested relative reference used by the vendored skills exists.
 4. Verify no manifest placeholder marker, stale `superpowers:` namespace, standalone `adhd` skill directory, ADHD package/runtime file, or Anthropic SDK dependency is present.
 5. Confirm Superpowers workflow identifiers and required support files remain present.
-6. Review the final diff and status, commit as `feat: create combined super-adhd-child plugin`, and push `codex/super-adhd-child` to `https://example.invalid/super-adhd-child` without force-pushing.
+6. Review the final diff and status, commit as `feat: create combined super-adhd-child plugin`, and publish the selected branch without force-pushing.
 
 The final report will include the branch, commit, push result, validator output, source SHAs, and the remaining instruction to disable duplicate standalone installations.
 

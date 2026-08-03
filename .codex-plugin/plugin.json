@@ -3,8 +3,8 @@
   "version": "1.4.0",
   "description": "Superpowers development workflows with explicit ADHD divergent ideation for Codex.",
   "author": {
-    "name": "redacted-user",
-    "url": "https://example.invalid"
+    "name": "Plugin Maintainers",
+    "url": "https://example.invalid/super-adhd-child"
   },
   "homepage": "https://example.invalid/super-adhd-child",
   "repository": "https://example.invalid/super-adhd-child",
@@ -15,7 +15,7 @@
     "displayName": "Super ADHD Child",
     "shortDescription": "Superpowers workflows with explicit divergent ideation",
     "longDescription": "Use Super ADHD Child for disciplined brainstorming, planning, TDD, debugging, review, delivery, and optional ADHD divergent exploration that hands selected directions back to Superpowers.",
-    "developerName": "redacted-user",
+    "developerName": "Plugin Maintainers",
     "category": "Developer Tools",
     "capabilities": ["Interactive", "Read", "Write"],
     "defaultPrompt": [

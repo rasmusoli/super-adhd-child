@@ -38,6 +38,20 @@ class RepositoryToolsTests(unittest.TestCase):
     def test_current_repository_contract_is_valid(self):
         self.assert_valid(ROOT)
 
+    def test_public_text_has_no_machine_specific_identity_or_paths(self):
+        absolute_machine_path = re.compile(r"(?:^|[\s`(])/(?:home|opt|srv|mnt)/")
+        plugin_repository_url = re.compile(r"https://github\.com/[^/\s]+/super-adhd-child")
+        local_hostname = re.compile(r"\b[a-z0-9-]+\.lan\b", re.IGNORECASE)
+        text_suffixes = {".cjs", ".json", ".js", ".md", ".py", ".sh", ".txt"}
+        for path in ROOT.rglob("*"):
+            if not path.is_file() or ".git" in path.parts or path.name == "skill.zip":
+                continue
+            if path.suffix.lower() not in text_suffixes:
+                continue
+            content = path.read_text(encoding="utf-8")
+            for pattern in (absolute_machine_path, plugin_repository_url, local_hostname):
+                self.assertIsNone(pattern.search(content), f"personal/local marker in {path}: {pattern.pattern}")
+
     def test_malformed_manifest_is_rejected(self):
         temp_dir, root = self.copy_repository()
         self.addCleanup(temp_dir.cleanup)

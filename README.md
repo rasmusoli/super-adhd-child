@@ -40,21 +40,20 @@ overwrite, or modify those installations automatically.
 
 ## Local validation and packaging
 
-From any current working directory, invoke the scripts with the repository
-path (replace the placeholder with the checkout path):
+Run these commands from the repository root:
 
 ```bash
-python3 /path/to/Super-ADHD-Child/scripts/validate_repo.py /path/to/Super-ADHD-Child
-python3 /path/to/Super-ADHD-Child/scripts/package_plugin.py /path/to/Super-ADHD-Child
-python3 /path/to/Super-ADHD-Child/scripts/package_plugin.py /path/to/Super-ADHD-Child --check
+python3 scripts/validate_repo.py .
+python3 scripts/package_plugin.py .
+python3 scripts/package_plugin.py . --check
 ```
 
 Run the test suite from the repository root with
 `python3 -m unittest discover -s tests -v`.
 
 The validator runs the official Codex plugin validator when it is discoverable
-through `CODEX_OFFICIAL_VALIDATOR`, `CODEX_HOME`, or the standard user Codex
-skills path. Use `--skip-official` in offline CI when it is unavailable. The
+from the active Codex installation. Use `--skip-official` in offline CI when it
+is unavailable. The
 packager validates source first, writes a stable archive with normalized ZIP
 metadata, and replaces `skill.zip` only after validation succeeds. The archive
 is committed; `--check` proves it is fresh without modifying it.
@@ -62,11 +61,8 @@ Inventory-declared runtime exclusions and namespaced skill references are
 machine-checked, so reintroduced excluded files or references to unshipped
 skills fail validation before packaging.
 
-For the locally verified official audit, run:
-
-```bash
-python3 <local-root>/.codex/skills/.system/plugin-creator/scripts/validate_plugin.py .
-```
+The official plugin validator can also be run directly from the active Codex
+installation against the repository root.
 
 ## Upstream maintenance
 
