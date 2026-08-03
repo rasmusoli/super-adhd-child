@@ -240,6 +240,23 @@ class RepositoryToolsTests(unittest.TestCase):
         all_skill_text = "\n".join(path.read_text() for path in (ROOT / "skills").rglob("*.md"))
         self.assertNotIn(obsolete_reference, all_skill_text)
 
+    def test_plugin_activation_defaults_to_capability_aware_subagent_delegation(self):
+        using_superpowers = (ROOT / "skills" / "using-superpowers" / "SKILL.md").read_text()
+        routing = (ROOT / "skills" / "using-super-adhd-child" / "SKILL.md").read_text()
+        policy = " ".join(using_superpowers.split()).lower()
+        routing_policy = " ".join(routing.split()).lower()
+        for marker in (
+            "when super adhd child is the active plugin",
+            "capability-aware subagent delegation as the default",
+            "independently separable work",
+            "do not wait for a second user request",
+            "trivial or tightly coupled work inline",
+            "never spawn ceremonial agents",
+        ):
+            self.assertIn(marker, policy)
+        self.assertIn("delegation default is separate from adhd routing", routing_policy)
+        self.assertIn("does not activate divergent ideation", routing_policy)
+
     def test_executing_plans_names_only_shipped_host_references(self):
         executing_plans = (ROOT / "skills" / "executing-plans" / "SKILL.md").read_text()
         self.assertIn(
