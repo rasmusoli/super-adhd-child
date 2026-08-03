@@ -1,3 +1,5 @@
+--Yes, Yes, stole from left right and centre--
+
 # Super ADHD Child
 
 Super ADHD Child is a dependency-free Codex plugin combining the Superpowers
