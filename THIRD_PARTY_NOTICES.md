@@ -91,6 +91,6 @@ The combined plugin makes these changes to the upstream skill material:
 12. Removes five excluded debugging development files, records their exact paths in `UPSTREAM_INVENTORY.json`, and enforces the exclusion during validation, offline inventory checks, and deterministic packaging.
 13. Removes invalid skill references and redundant dispatch-skill worked examples while preserving the operative workflow gates and review contracts.
 14. Corrects the executing-plans host-reference note and documents how Codex maps the generic subagent template to its built-in agents.
-15. Defaults plugin activation to capability-aware delegation for independent work while preserving manual-first ADHD ideation.
+15. Replaces unconditional activation delegation with economics-based routing: proactively evaluate delegation, use the cheapest sufficient topology, wait efficiently, and resolve relevant documentation contradictions while preserving manual-first ADHD ideation and high-assurance review gates.
 
 The plugin does not include the ADHD CLI/library or Anthropic Agent SDK dependencies. It also does not remove, alter, or uninstall any standalone ADHD or Superpowers installation.

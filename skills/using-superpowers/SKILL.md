@@ -40,11 +40,45 @@ rollback, and verification.
 
 ## Codex collaboration policy
 
-When Super ADHD Child is the active plugin, treat capability-aware subagent
-delegation as the default for independently separable work, including
-exploration, tests, review, documentation, and implementation sidecars; do not
-wait for a second user request to delegate. Keep trivial or tightly coupled
-work inline, and never spawn ceremonial agents.
+Proactively evaluate delegation without waiting for a second user request.
+Use the cheapest sufficient execution topology. Delegation requires
+independently separable work, at least one meaningful benefit (isolation,
+specialization, parallelism, controller-context preservation, cheaper
+execution, independent verification, or durable long-running execution), and
+expected benefit that exceeds assignment cost, handoff cost, waiting cost,
+review cost, likely repair cost, context reconstruction, and added wall-clock
+delay. Use practical judgment; numeric token calculations are not required.
+
+### Lightest sufficient topology
+
+- **Direct execution:** Use the main agent for trivial, short, tightly coupled,
+  highly context-dependent, clarification-heavy, or faster-inline work. One-line
+  edits, small config changes, narrow command generation, and tightly coupled
+  bug fixes may remain inline.
+- **One Reader:** Use one read-only worker for bounded exploration when a concise
+  evidence report preserves substantial controller context. Dispatch once,
+  consume one final report, and do not automatically follow it with a Builder.
+- **One Builder:** Use one implementation worker for a bounded scope with clear
+  acceptance criteria, a bounded edit surface, and focused self-verification.
+  One Builder or direct execution may be sufficient; do not automatically add
+  a Reader, Builder, Tester, Reviewer, or documentation worker.
+- **Builder plus independent review:** Extra review requires risk or
+  verification justification, such as security, authentication or
+  authorization, public contracts, migration or data integrity, concurrency,
+  subtle correctness, broad integration, production impact, meaningful
+  regression risk, or an explicit independent-verification requirement. The
+  reviewer must add independent evidence, not repeat trustworthy unchanged
+  tests.
+- **Parallel workers:** Use parallel workers only for genuinely independent
+  domains with no shared mutable state or overlapping files, when integration
+  is safe and parallelism creates meaningful wall-clock benefit. Do not
+  maximize worker count merely because capacity exists.
+- **Full subagent-driven development:** Reserve the high-assurance workflow for
+  approved written plans, multiple meaningful tasks, important integrations,
+  broad changes, substantial context or time, or work where per-task review
+  materially reduces risk. Preserve fresh per-task implementers, review gates,
+  repair loops, ledgers, final whole-branch review, and
+  finishing-a-development-branch. Never spawn ceremonial agents.
 
 When a workflow needs isolated subagents, detect the capability exposed by the
 current Codex surface and read its actual concurrency limit. Use independent
@@ -66,9 +100,42 @@ names or override an explicit constraint. Use the currently exposed operations
 for dispatch, waiting, continuation, and cleanup. If cleanup is unavailable,
 let completed branches terminate naturally and report that limitation.
 
-Before changing this guidance, use local read-only checks such as
-`codex --version`, the available collaboration capability, and the current
-repository branch/worktree state.
+### Waiting and handoff
+
+After dispatch, use the current host's native blocking wait, completion event,
+wait-thread, or equivalent efficient lifecycle feature when available. Detect
+the capability and do not hard-code the feature name or a lifecycle operation
+name. Do not use live monitoring, repeated short waits, short status polling,
+filesystem polling solely to see whether work started, or evidence-free
+check-ins. Resume coordination only when the worker completes, reports a
+blocker or defect, a meaningful timeout expires, or the user intervenes. If
+the host cannot wait efficiently, use its least expensive supported behavior
+and report that limitation honestly. For external processes, use one suitable
+wait or condition-based waiting when the next action depends on a real
+observable condition.
+
+Keep file-based handoffs. Give workers only the task ID, desired outcome,
+assigned and protected scope, acceptance criteria, source paths, validation
+expectation, and return contract. Do not paste full conversation history,
+repeated summaries, old logs, completed-task history, or an entire plan when a
+bounded task brief is enough. Make reports evidence-driven and detailed in a
+file when necessary; do not request routine progress narration.
+
+### Documentation-consistency preflight
+
+Before delegating related multi-step project work, inspect the smallest
+relevant set of approved requirements, active implementation plan, durable
+project documentation, current interfaces and contracts, relevant tests, and
+actual current code behavior. Look for material contradictions, including
+conflicting APIs, stale architecture, obsolete tests, overlapping ownership,
+or documentation for missing files. Resolve material contradictions at the
+coordinator level before workers act; do not silently choose a source of truth.
+Do not perform a repository-wide documentation audit unless the task requires
+it.
+
+Before changing this guidance, use local read-only checks such as `codex
+--version`, the available collaboration capability, and the current repository
+branch/worktree state.
 
 ## Red Flags
 

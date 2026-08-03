@@ -1,5 +1,18 @@
 # Changelog
 
+## 1.4.0 - 2026-08-03
+
+- Replaced unconditional delegation-on-activation with economics-based routing
+  that chooses the cheapest sufficient topology and keeps trivial or tightly
+  coupled work direct.
+- Added compact Reader, Builder, review, parallelism, and full-SDD routing
+  guidance without weakening high-assurance review gates.
+- Added capability-aware event waiting, bounded file handoffs, and a relevant
+  documentation-consistency preflight that resolves material contradictions at
+  coordinator level.
+- Preserved manual-first ADHD ideation and regenerated the deterministic plugin
+  archive.
+
 ## 1.3.0 - 2026-08-02
 
 - Removed five excluded debugging development files and made inventory

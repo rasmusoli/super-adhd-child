@@ -240,22 +240,62 @@ class RepositoryToolsTests(unittest.TestCase):
         all_skill_text = "\n".join(path.read_text() for path in (ROOT / "skills").rglob("*.md"))
         self.assertNotIn(obsolete_reference, all_skill_text)
 
-    def test_plugin_activation_defaults_to_capability_aware_subagent_delegation(self):
+    def test_delegation_economics_and_topology_policy(self):
         using_superpowers = (ROOT / "skills" / "using-superpowers" / "SKILL.md").read_text()
         routing = (ROOT / "skills" / "using-super-adhd-child" / "SKILL.md").read_text()
+        development = (ROOT / "skills" / "subagent-driven-development" / "SKILL.md").read_text()
         policy = " ".join(using_superpowers.split()).lower()
         routing_policy = " ".join(routing.split()).lower()
         for marker in (
-            "when super adhd child is the active plugin",
-            "capability-aware subagent delegation as the default",
+            "proactively evaluate delegation",
+            "without waiting for a second user request",
             "independently separable work",
-            "do not wait for a second user request",
-            "trivial or tightly coupled work inline",
+            "meaningful benefit",
+            "expected benefit",
+            "assignment cost",
+            "handoff cost",
+            "waiting cost",
+            "review cost",
+            "repair cost",
+            "context reconstruction",
+            "added wall-clock delay",
+            "lightest sufficient topology",
+            "direct execution",
+            "one reader",
+            "one builder",
+            "independent review",
+            "full subagent-driven development",
+            "approved written plans",
             "never spawn ceremonial agents",
+            "do not automatically add a reader",
+            "never assume five workers",
+            "never invent model names",
+            "fixed operation name",
+            "native blocking wait",
+            "completion event",
+            "do not hard-code the feature name",
+            "repeated short waits",
+            "evidence-free check-ins",
+            "meaningful timeout",
+            "user intervenes",
+            "material contradictions",
+            "coordinator level",
+            "repository-wide documentation audit",
         ):
             self.assertIn(marker, policy)
-        self.assertIn("delegation default is separate from adhd routing", routing_policy)
+        self.assertIn("delegation evaluation is separate from adhd routing", routing_policy)
         self.assertIn("does not activate divergent ideation", routing_policy)
+        self.assertNotIn("capability-aware subagent delegation as the default", policy)
+        for marker in (
+            "fresh per-task",
+            "review after each task",
+            "required spec-compliance and quality review loop",
+            "fix round",
+            "ledger",
+            "whole-branch review",
+            "finishing-a-development-branch",
+        ):
+            self.assertIn(marker, development.lower())
 
     def test_executing_plans_names_only_shipped_host_references(self):
         executing_plans = (ROOT / "skills" / "executing-plans" / "SKILL.md").read_text()

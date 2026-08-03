@@ -10,7 +10,7 @@ This plugin combines the Superpowers development methodology with ADHD divergent
 ## Routing policy
 
 - ADHD routing is manual-first: use it only for an explicit ADHD request, an explicit request for divergent ideation or parallel cognitive frames, or genuinely open-ended ideation where breadth is the actual need.
-- The plugin activation delegation default is separate from ADHD routing: it does not activate divergent ideation, which remains manual-first and requires an explicit ADHD or divergent-ideation request.
+- Delegation evaluation is separate from ADHD routing: evaluating or using a worker does not activate divergent ideation, which remains manual-first and requires an explicit ADHD or divergent-ideation request.
 - Do not use ADHD automatically for ordinary feature design, implementation planning, TDD, known-root-cause debugging, code review, or branch finishing.
 - ADHD performs divergent generation, scoring, clustering, trap detection, and deepening. It does not approve or implement a direction.
 - After the user selects a direction, hand it to `super-adhd-child:brainstorming` for the approved design gate.
